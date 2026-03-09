@@ -19,11 +19,6 @@ A containerized, multi-user JupyterHub instance with a unified REST API for note
 - Docker Engine 20.10+ with Docker Compose 1.29+
 - Ports `8000` and `8080` available
 
-### Docker Images
-
-Automatically pulled on first build:
-- `jupyter/datascience-notebook:latest` (user environment)
-- `alpine:latest` (file operations)
 
 ## Quick Start
 
