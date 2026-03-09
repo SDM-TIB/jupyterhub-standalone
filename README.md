@@ -175,28 +175,6 @@ Returns `503 Service Unavailable` if no free users are available.
    - If total age exceeds `JUPYTERHUB_CULLER_MAX_AGE` seconds → force stop
 6. Container and its volume are removed when culled
 
-### Required Volumes
-
-- **jupyterhub_data**: JupyterHub metadata (SQLite DB, OAuth state)
-- **notebook_storage**: Source notebooks (read-only, synced at startup)
-- **jupyterhub-guestN** (per user): User's working directory (removed on cull)
-
-### Environment Variables
-
-| Variable | Default | Purpose |
-|----------|---------|---------|
-| `JUPYTERHUB_API_TOKEN` | (required) | API authentication & Flask secret key |
-| `JUPYTERHUB_BASE_URL` | `/ldmjupyter` | URL path prefix for hub |
-| `JUPYTERNOTEBOOK_URL` | (required) | External URL returned to users |
-| `JUPYTERHUB_TIMEOUT` | `180` | Idle cutoff (seconds) |
-| `JUPYTERHUB_CULLER_MAX_AGE` | `600` | Max server lifetime (seconds) |
-| `JUPYTERHUB_USER` | `3` | Number of guest users |
-| `JUPYTERHUB_PERCENTAGE_CPU` | `50` | CPU quota per container (%) |
-| `JUPYTERHUB_MEMORY_LIMIT` | `1G` | Memory per container |
-| `NETWORK` | `jupyterhub_network` | Docker network name |
-| `STORAGE_PATH` | `/notebooks` | Container path to notebooks |
-| `API_JUPYTERHUB` | `http://jupyterhub:6000` | Internal API URL |
-
 ## Troubleshooting
 
 **Port 8080 unavailable**: Change docker-compose.yml to `"8081:6000"` and update requests.
