@@ -74,7 +74,6 @@ curl --location 'http://localhost:8080/session_info' \
 
 ```bash
 curl --location 'http://localhost:8080/admin' \
---header 'Authorization: Bearer YYY-TOKEN' \
   --form 'action="default_setup"' \
   --form 'JUPYTERHUB_TIMEOUT="3600"' \
   --form 'JUPYTERHUB_USER="50"' \
