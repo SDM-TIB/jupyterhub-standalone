@@ -35,14 +35,23 @@ API_URL = os.getenv('API_JUPYTERHUB')
 # ---------------------------------------------------------------------------
 
 def require_token(f):
-    """Decorator that enforces Bearer token authentication using JUPYTERHUB_API_TOKEN."""
+    """Decorator that enforces authentication using JUPYTERHUB_API_TOKEN.
+    Accepts the token via:
+      - Authorization: Bearer <token>  (fetch/curl API calls)
+      - ?token=<token> query parameter (iframe browser navigations)
+      - token form field               (HTML form submissions)
+    """
     @wraps(f)
     def decorated(*args, **kwargs):
-        auth_header = request.headers.get('Authorization', '')
         expected_token = os.getenv('JUPYTERHUB_API_TOKEN', '')
-        if not auth_header.startswith('Bearer ') or auth_header[len('Bearer '):] != expected_token:
-            return jsonify({'error': 'Unauthorized', 'message': 'Valid Bearer token required'}), 401
-        return f(*args, **kwargs)
+        auth_header = request.headers.get('Authorization', '')
+        if auth_header.startswith('Bearer ') and auth_header[len('Bearer '):] == expected_token:
+            return f(*args, **kwargs)
+        if request.args.get('token') == expected_token:
+            return f(*args, **kwargs)
+        if request.form.get('token') == expected_token:
+            return f(*args, **kwargs)
+        return jsonify({'error': 'Unauthorized', 'message': 'Valid Bearer token required'}), 401
     return decorated
 
 
@@ -161,7 +170,8 @@ def index():
     """Main dashboard page"""
     extra_vars = {
         'max_users': os.environ.get('JUPYTERHUB_USER', '3'),
-        'base_url': os.environ.get('JUPYTERNOTEBOOK_URL', 'http://localhost:8000/ldmjupyter/')
+        'base_url': os.environ.get('JUPYTERNOTEBOOK_URL', 'http://localhost:8000/ldmjupyter/'),
+        'api_token': os.getenv('JUPYTERHUB_API_TOKEN', '')
     }
     return render_template('dashboard.html', **extra_vars)
 
@@ -316,7 +326,8 @@ def admin():
         'timeout': os.environ.get('JUPYTERHUB_TIMEOUT'),
         'max_user': os.environ.get('JUPYTERHUB_USER'),
         'cpu': os.environ.get('JUPYTERHUB_PERCENTAGE_CPU'),
-        'memory': os.environ.get('JUPYTERHUB_MEMORY_LIMIT')
+        'memory': os.environ.get('JUPYTERHUB_MEMORY_LIMIT'),
+        'api_token': os.getenv('JUPYTERHUB_API_TOKEN', '')
     }
     log.info(f"Response: {extra_vars}")
     return render_template('admin_jupyter.html', **extra_vars)
