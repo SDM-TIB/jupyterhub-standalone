@@ -1,0 +1,50 @@
+version: "3.5"
+
+volumes:
+  jupyterhub_data:
+  notebook_storage:  # New volume for storing notebooks
+    name: notebook_storage
+
+services:
+  jupyterhub:
+    container_name: jupyterhub
+    restart: unless-stopped
+    build: 
+      context: ./jupyterhub/
+      args:
+        - JUPYTERHUB_BASE_URL=${JUPYTERHUB_BASE_URL}
+        - JUPYTERNOTEBOOK_URL=${JUPYTERNOTEBOOK_URL}
+    image: standalone_jupyterhub
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - jupyterhub_data:/srv/jupyterhub/data
+      # - notebook_data:${STORAGE_PATH}
+      - ./notebooks:/notebooks:ro  # Mount notebooks folder for reading in admin app
+    ports:
+      - "8000:8000"  # JupyterHub web interface
+      - "8080:6000"  # API + Admin panel
+    env_file:
+      - .env
+    networks:
+      - jupyterhub_network
+  # New service to initialize the notebook storage volume
+  notebook-init:
+    image: alpine:latest
+    volumes:
+      - ./notebooks:/source:ro  # Mount your local notebooks folder as read-only
+      - notebook_storage:/target  # Mount the notebook storage volume
+    command: >
+      sh -c "
+        echo 'Copying notebooks to storage volume...' &&
+        mkdir -p /target/notebook &&
+        cp -R /source/* /target/notebook/ 2>/dev/null || echo 'No files to copy' &&
+        chown -R 1000:100 /target &&
+        echo 'Notebook initialization complete'
+      "
+    depends_on:
+      - jupyterhub
+    restart: "no"  # Run only once
+
+networks:
+  jupyterhub_network:
+    name: ${NETWORK}

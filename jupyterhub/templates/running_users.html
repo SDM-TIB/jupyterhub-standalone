@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JupyterHub - Running Users</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <style>
+        body {
+            padding-top: 20px;
+            background-color: #f8f9fa;
+        }
+        .container {
+            max-width: 1200px;
+        }
+        .header {
+            margin-bottom: 30px;
+            border-bottom: 1px solid #dee2e6;
+            padding-bottom: 10px;
+        }
+        .content-box {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .user-card {
+            background-color: #e9ecef;
+            border-left: 4px solid #007bff;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+        }
+        .no-users {
+            padding: 20px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+            text-align: center;
+            color: #6c757d;
+        }
+        .actions {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>JupyterHub Running Users</h1>
+            <p>This page shows all currently active JupyterHub user sessions.</p>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="content-box">
+                    <h2>Active Users</h2>
+                    
+                    {% if users %}
+                        <div class="users-list">
+                            {% for user in users %}
+                                <div class="user-card">
+                                    <strong>{{ user }}</strong>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="no-users">
+                            <p>No active JupyterHub users at the moment.</p>
+                        </div>
+                    {% endif %}
+                    
+                    <div class="actions">
+                        <button onclick="window.location.reload()" class="btn btn-secondary">Refresh</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

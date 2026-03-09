@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JupyterHub - No Users Available</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .jupyternotebook_error {
+            background-color: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 500px;
+        }
+        .jupyternotebook_error h1 {
+            color: #dc3545;
+            margin-bottom: 20px;
+        }
+        .jupyternotebook_error p {
+            color: #6c757d;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+        .gears {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 30px 0;
+        }
+        .gear {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 3px solid #007bff;
+            position: relative;
+            margin: 0 10px;
+            animation: spin 2s linear infinite;
+        }
+        .gear.two {
+            animation-delay: -0.5s;
+        }
+        .gear.three {
+            animation-delay: -1s;
+        }
+        .gear .bar {
+            position: absolute;
+            width: 6px;
+            height: 20px;
+            background-color: #007bff;
+            border-radius: 3px;
+            top: 50%;
+            left: 50%;
+            transform-origin: 3px 0;
+        }
+        .gear .bar:nth-child(1) {
+            transform: translate(-50%, -50%) rotate(0deg);
+        }
+        .gear .bar:nth-child(2) {
+            transform: translate(-50%, -50%) rotate(120deg);
+        }
+        .gear .bar:nth-child(3) {
+            transform: translate(-50%, -50%) rotate(240deg);
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .home-link {
+            margin-top: 30px;
+        }
+        .home-link a {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        .home-link a:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="jupyternotebook_error" id="jupyternotebook_error_div">
+        <h1>No Free JupyterHub Users Available <b>:(</b></h1>
+        <p>Sorry, there are no free JupyterHub users at the moment.</p>
+        <p>Please wait a few minutes and try again.</p>
+        <div class="gears">
+            <div class="gear one">
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+            </div>
+            <div class="gear two">
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+            </div>
+            <div class="gear three">
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+            </div>
+        </div>
+        <div class="home-link">
+            <a href="javascript:history.back()">Go Back</a>
+        </div>
+    </div>
+</body>
+</html>

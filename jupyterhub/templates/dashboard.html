@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JupyterHub - Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* JupyterHub Official Colors */
+        :root {
+            --jupyter-orange: #F37726;
+            --jupyter-dark-grey: #767677;
+            --jupyter-light-grey: #ABABAB;
+            --jupyter-off-white: #F7F7F7;
+            --jupyter-white: #FFFFFF;
+        }
+
+        body {
+            padding-top: 20px;
+            background-color: var(--jupyter-off-white);
+        }
+        .container {
+            max-width: 1400px;
+        }
+        .header {
+<!--            background: var(&#45;&#45;jupyter-orange);-->
+<!--            color: white;-->
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .header-icon {
+            width: 60px;
+            height: 60px;
+            object-fit: contain;
+        }
+        .header-text {
+            flex: 1;
+        }
+        .header h1 {
+            margin-bottom: 5px;
+            font-size: 32px;
+        }
+        .header p {
+            margin: 0;
+            opacity: 0.95;
+        }
+        .nav-tabs {
+            margin-bottom: 30px;
+            border-bottom: 2px solid var(--jupyter-light-grey);
+        }
+        .nav-tabs .nav-link {
+            color: var(--jupyter-dark-grey);
+            border: none;
+            padding: 12px 24px;
+            margin-right: 5px;
+            border-radius: 8px 8px 0 0;
+            transition: all 0.3s;
+        }
+        .nav-tabs .nav-link:hover {
+            background-color: var(--jupyter-off-white);
+            color: var(--jupyter-orange);
+        }
+        .nav-tabs .nav-link.active {
+            background-color: white;
+            color: var(--jupyter-orange);
+            font-weight: bold;
+            border-bottom: 3px solid var(--jupyter-orange);
+        }
+        .nav-tabs .nav-link img {
+            width: 20px;
+            height: 20px;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+        .content-box {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            min-height: 400px;
+        }
+        .notebook-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .notebook-card {
+            background: white;
+            border: 2px solid var(--jupyter-light-grey);
+            border-radius: 10px;
+            padding: 20px;
+            transition: all 0.3s;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        .notebook-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(243, 119, 38, 0.2);
+            border-color: var(--jupyter-orange);
+        }
+        .notebook-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--jupyter-orange);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .notebook-card:hover::before {
+            opacity: 1;
+        }
+        .notebook-icon {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 15px;
+            object-fit: contain;
+        }
+        .notebook-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+            word-break: break-word;
+        }
+        .notebook-meta {
+            font-size: 14px;
+            color: var(--jupyter-dark-grey);
+            margin-bottom: 15px;
+        }
+        .open-button {
+            width: 100%;
+            padding: 10px;
+            background: var(--jupyter-orange);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        .open-button:hover {
+            background: #D35F1A;
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(243, 119, 38, 0.4);
+        }
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+        .loading-content {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--jupyter-orange);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--jupyter-dark-grey);
+        }
+        .empty-state i {
+            font-size: 80px;
+            margin-bottom: 20px;
+            color: var(--jupyter-light-grey);
+        }
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: var(--jupyter-light-grey);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .stat-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="/static/jupyterhub_logo.png" alt="JupyterHub" class="header-icon" onerror="this.style.display='none'">
+            <div class="header-text">
+                <h1>JupyterHub Dashboard</h1>
+                <p>Welcome to your interactive notebook environment</p>
+            </div>
+        </div>
+
+        <ul class="nav nav-tabs" id="mainTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="notebooks-tab" data-bs-toggle="tab" data-bs-target="#notebooks" type="button">
+                    <img src="/static/notebook_icon.png" alt="" onerror="this.style.display='none'">
+                    Notebooks
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="admin-tab" data-bs-toggle="tab" data-bs-target="#admin" type="button">
+                    <i class="fas fa-cog"></i> Admin Panel
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="users-tab" data-bs-toggle="tab" data-bs-target="#users" type="button">
+                    <i class="fas fa-users"></i> Running Users
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="mainTabContent">
+            <!-- Notebooks Tab -->
+            <div class="tab-pane fade show active" id="notebooks" role="tabpanel">
+                <div class="content-box">
+                    <div class="stats-row">
+                        <div class="stat-card">
+                            <div class="stat-value" id="notebookCount">0</div>
+                            <div class="stat-label">Available Notebooks</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="userCount">{{ max_users }}</div>
+                            <div class="stat-label">Max Concurrent Users</div>
+                        </div>
+                    </div>
+
+                    <h2>Available Notebooks</h2>
+                    <div class="notebook-grid" id="notebookGrid">
+                        <!-- Notebooks will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin Panel Tab -->
+            <div class="tab-pane fade" id="admin" role="tabpanel">
+                <div class="content-box">
+                    <iframe src="/admin" style="width: 100%; height: 800px; border: none;"></iframe>
+                </div>
+            </div>
+
+            <!-- Running Users Tab -->
+            <div class="tab-pane fade" id="users" role="tabpanel">
+                <div class="content-box">
+                    <iframe src="/running_users" style="width: 100%; height: 600px; border: none;"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <h3>Opening Notebook...</h3>
+            <p>Please wait while we prepare your environment</p>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Load notebooks from the server
+        async function loadNotebooks() {
+            try {
+                const response = await fetch('/list_notebooks');
+                const data = await response.json();
+
+                const notebookGrid = document.getElementById('notebookGrid');
+                const notebookCount = document.getElementById('notebookCount');
+
+                if (data.notebooks && data.notebooks.length > 0) {
+                    notebookCount.textContent = data.notebooks.length;
+
+                    notebookGrid.innerHTML = data.notebooks.map(notebook => `
+                        <div class="notebook-card" onclick="openNotebook('${notebook.name}')">
+                            <img src="/static/notebook_file_icon.png" alt="Notebook" class="notebook-icon" onerror="this.onerror=null; this.outerHTML='<div class=\\'notebook-icon\\'><i class=\\'fas fa-file-code\\'></i></div>';">
+                            <div class="notebook-name">${notebook.name}</div>
+                            <div class="notebook-meta">
+                                <i class="far fa-calendar"></i> ${notebook.modified || 'Unknown'}
+                            </div>
+                            <button class="open-button">
+                                <i class="fas fa-play"></i> Open Notebook
+                            </button>
+                        </div>
+                    `).join('');
+                } else {
+                    notebookGrid.innerHTML = `
+                        <div class="empty-state" style="grid-column: 1 / -1;">
+                            <i class="fas fa-folder-open"></i>
+                            <h3>No Notebooks Available</h3>
+                            <p>Add notebooks to the notebooks folder to get started</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error loading notebooks:', error);
+                document.getElementById('notebookGrid').innerHTML = `
+                    <div class="empty-state" style="grid-column: 1 / -1;">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <h3>Error Loading Notebooks</h3>
+                        <p>Please check your server connection</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Open a notebook - all logic is now handled by Python backend
+        async function openNotebook(notebookName) {
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            loadingOverlay.style.display = 'flex';
+
+            try {
+                // Call Python backend to handle session management and notebook opening
+                const response = await fetch(`/open_notebook/${encodeURIComponent(notebookName)}`);
+                const data = await response.json();
+
+                if (response.status === 503) {
+                    // No users available
+                    loadingOverlay.style.display = 'none';
+                    alert('No free users available. Please wait a few minutes and try again.');
+                    return;
+                }
+
+                if (!data.success) {
+                    loadingOverlay.style.display = 'none';
+                    alert(data.message || 'Error opening notebook. Please try again.');
+                    return;
+                }
+
+                // Open the notebook in a new tab
+                window.open(data.url, '_blank');
+
+                loadingOverlay.style.display = 'none';
+
+                // Log session info for debugging
+                console.log('Opened notebook:', notebookName);
+                console.log('User:', data.user);
+                console.log('Existing session:', data.existing_session);
+            } catch (error) {
+                console.error('Error opening notebook:', error);
+                loadingOverlay.style.display = 'none';
+                alert('Error opening notebook. Please try again.');
+            }
+        }
+
+        // Load notebooks when page loads
+        document.addEventListener('DOMContentLoaded', loadNotebooks);
+
+        // Refresh notebooks when tab is clicked
+        document.getElementById('notebooks-tab').addEventListener('click', loadNotebooks);
+    </script>
+</body>
+</html>
