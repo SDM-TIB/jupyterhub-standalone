@@ -20,7 +20,7 @@ A containerized, multi-user JupyterHub instance with a unified REST API for note
 - Ports `8000` and `8080` available
 
 
-## Quick Start
+## Start
 
 ### 1. Configure Environment
 
